@@ -37,9 +37,9 @@ platforms:
     driver_config:
       image: ubuntu2204_salt_minion
       platform: ubuntu
-      hostname: ubuntu2204.local
-      container_name: u2204
-      instance_name: u2204
+      hostname: ufcolo1-app3-bob
+      container_name: ufcolo1-app3-bob
+      instance_name: ufcolo1-app3-bob
   # - name: ubuntu-20.04
   #   driver_config:
   #     image: ubuntu2004_salt_minion
@@ -68,14 +68,20 @@ suites:
       state_top:
         base:
           '*':
-            - aformula
-            - bformula
+            # - servers
+            # - network.vhost-container
+            # - ufdeploy.bin
+            # - ufdeploy.webapp.apache
+            # - ufdeploy.webapp.tomcat
+            # - java11
+            - app-server.tomcat-tar
+            # - rsyslog.client
       pillars:
         top.sls:
           base:
             '*':
-              - aformula
-              - bformula
+              - ufconfig
+              - ufconfig-app
       pillars_from_directories:
       - pillars
     verifier:

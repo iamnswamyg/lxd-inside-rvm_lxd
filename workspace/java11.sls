@@ -1,4 +1,3 @@
-# Temporär till java-11 släppls från ubuntus egna repos.
 openjdk-r/ppa:
   pkgrepo.managed:
     - humanname: PPA for OpenJDK uploads (restricted)

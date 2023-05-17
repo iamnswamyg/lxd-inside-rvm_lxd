@@ -8,4 +8,5 @@ RUN    echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selec
     
 
 RUN    apt update \
-    && apt install -y salt-minion
+    && apt install -y salt-minion \
+    && apt install -y rsyslog

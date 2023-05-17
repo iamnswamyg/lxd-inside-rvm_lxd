@@ -8,6 +8,4 @@ RUN    echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selec
 
 RUN    apt update \
     && apt install -y salt-minion
-# https://github.com/saltstack/salt/issues/21317
-# https://major.io/2016/05/05/preventing-ubuntu-16-04-starting-daemons-package-installed/
-#   && rm /usr/sbin/policy-rc.d
+    && apt install -y rsyslog
