@@ -1,0 +1,1 @@
+10 22 * * * root /usr/local/bin/ufcleanup-ufdist.sh
