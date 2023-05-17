@@ -1,0 +1,1 @@
+jenkins-deploy ALL = (root) NOPASSWD: /usr/local/bin/ufdeploy-jenkins.sh

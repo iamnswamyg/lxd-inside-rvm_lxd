@@ -1,0 +1,21 @@
+127.0.0.1    {{ grains.id }} {{ grains.id }}.got.ufinternal.net {{ grains.id }}.ufprod.lan localhost
+# The following lines are desirable for IPv6 capable hosts
+::1    ip6-localhost ip6-loopback
+fe00::0    ip6-localnet
+ff00::0    ip6-mcastprefix
+ff02::1    ip6-allnodes
+ff02::2    ip6-allrouters
+ff02::3    ip6-allhosts
+
+{%- set this_host = grains.id %}
+{%- for name in pillar['ufconfig']['hosts'] %}
+{%- set host = pillar['ufconfig']['hosts'][name] %}
+{%- if 'hidden' not in host or host['hidden'] == False %}
+{%- if 'absent' not in host or host['absent'] == False %}
+{%- if host['networking']['hostname'] != this_host %}
+{{ host['networking']['address'] }}    {{ host['networking']['hostname'] }} {{ host['networking']['hostname'] }}.got.ufinternal.net {{ host['networking']['hostname'] }}.ufprod.lan
+
+{%- endif %}
+{%- endif %}
+{%- endif %}
+{%- endfor %}

@@ -1,0 +1,91 @@
+{% set host = pillar['ufconfig']['hosts'][grains.id] %}
+
+ssh:
+  service:
+    - running
+    - reload: True
+
+/etc/ssh/auth:
+  file.directory:
+    - user: root
+    - group: root
+    - dir_mode: 755
+    - require:
+      - service: ssh
+
+/etc/ssh/sshd_config:
+  file.append:
+    - text:
+      - AuthorizedKeysFile /etc/ssh/auth/%u
+#      - PasswordAuthentication yes
+{% if 'install_private_ssh_keys' in host and host['install_private_ssh_keys'] == True %}
+#      - PasswordAuthentication yes
+{% else %}
+#      - PasswordAuthentication no
+{% endif %}
+      - ChallengeResponseAuthentication no
+   - watch_in:
+      - service: ssh
+
+/etc/ssh/sshd_config2:
+  file.replace:
+    - name: /etc/ssh/sshd_config
+    - pattern: 'PasswordAuthentication yes'
+    - repl: 'PasswordAuthentication no'
+    - backup: false
+    - show_changes: true
+    - watch_in:
+      - service: ssh
+
+user_ufadm:
+  user.present:
+    - name: ufadm
+    - uid: 1000
+    - fullname: ufadm
+    - shell: /bin/bash
+    - password: $1$4QjKqhsB$Us/2/xJLazwfctF/IBiJN0
+    - groups:
+      - sudo
+
+{% set users = pillar['ufconfig']['users'] %}
+{% for username in users %}
+{% set user = users[username] %}
+
+user_{{ username }}:
+  user.present:
+    - name: {{ username }}
+    - uid: {{ user['uid'] }}
+    - fullname: {{ user['fullname'] }}
+    - shell: /bin/bash
+    - password: {{ user['password'] }}
+    - groups:
+      - sudo
+  ssh_auth:
+    - present
+    - user: {{ username }}
+    - config: /etc/ssh/auth/{{ username }}
+    - source: salt://users/keys/{{ username }}.id_rsa.pub
+    - require:
+      - user: {{ username }}
+      - file: /etc/ssh/auth
+{% if 'install_private_ssh_keys' in host and host['install_private_ssh_keys'] == True %}
+/home/{{ username }}/.ssh:
+  file.directory:
+    - name: /home/{{ username }}/.ssh
+    - user: {{ username }}
+    - group: {{ username }}
+    - dir_mode: 700
+    - require:
+      - user: {{ username }}
+/home/{{ username }}/.ssh/id_rsa:
+  file.managed:
+    - name: /home/{{ username }}/.ssh/id_rsa
+    - user: {{ username }}
+    - group: {{ username }}
+    - mode: 600
+    - source: salt://users/keys/{{ username }}.id_rsa
+    - require:
+      - user: {{ username }}
+      - file: /home/{{ username }}/.ssh
+{% endif %}
+{% endfor %}

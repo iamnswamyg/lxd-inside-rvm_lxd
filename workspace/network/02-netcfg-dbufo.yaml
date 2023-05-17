@@ -1,0 +1,27 @@
+{%- set host = pillar['ufconfig']['hosts'][grains.id] %}
+{%- set networking_dbufo = host['networking']['dbufo'] %}
+{%- set network = pillar['ufconfig']['networks'][networking_dbufo['network']] %}
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1np0:
+      dhcp4: no
+      dhcp6: no
+      optional: true
+    eno2np1:
+      dhcp4: no
+      dhcp6: no
+      optional: true
+  bonds:
+    bond1:
+      interfaces: [eno1np0, eno2np1]
+      parameters:
+        mode: 802.3ad
+        lacp-rate: fast
+        mii-monitor-interval: 100
+      dhcp4: no
+      dhcp6: no
+      addresses: [{{ networking_dbufo['address'] }}/{{ network['network-prefix'] }}]

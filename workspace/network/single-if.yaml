@@ -1,0 +1,29 @@
+{%- set host = pillar['ufconfig']['hosts'][grains.id] %}
+{%- set networking = host['networking'] %}
+{%- set network = pillar['ufconfig']['networks'][networking['network']] %}
+{%- set ifaces = networking.get('ifaces', ['eth0']) %}
+{%- set iface1 = ifaces[0] %}
+{%- set nameservers = networking['dns-nameservers']|default(network['dns-nameservers']) %}
+# This file describes the network interfaces available on your system
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    {{ iface1 }}:
+      dhcp4: no
+      dhcp6: no
+      addresses: [{{ networking['address'] }}/{{ network['network-prefix'] }}]
+{%- if grains['os'] == 'Ubuntu' and grains['osmajorrelease'] <= 18 %}
+      gateway4: {{ network['gateway'] }}
+{%- else %}
+      routes:
+        - to: default
+          via: {{ network['gateway'] }}
+{%- endif %}
+      nameservers:
+        search: [{{ network['dns-search'] }}]
+        addresses:
+{%- for nameserver in nameservers %}
+          - {{ nameserver }}
+{%- endfor %}

@@ -1,0 +1,77 @@
+{%- set host = pillar['ufconfig']['hosts'][grains.id] %}
+{%- set network = pillar['ufconfig']['networks'][host['networking']['network']] %}
+{%- set remote_mounts = host['remote-mounts'] %}
+{%- set JAVA_HOME = host.get('JAVA_HOME', '/usr/lib/jvm/java-11-openjdk-amd64')  %}
+
+[Unit]
+Description=Apache Tomcat {{ tomcatversion }} on {{ host['tomcat-name'] }}
+After=network.target
+
+{%- if remote_mounts is defined and grains['osfinger'] >= 'Ubuntu-22.04' %}
+# remote-mounts are defined for this system, ensure tomcat will not start without them.
+# this can probably also be done with a static require against remote-fs.target
+{%- for mount in remote_mounts %}
+After=net-glusterfs-{{ mount }}.mount
+Requires=net-glusterfs-{{ mount }}.mount
+{%- endfor %}
+{%- endif %}
+
+[Service]
+Type=forking
+User=tomcat
+Group=tomcat
+UMask=0007
+# Previously, a "default"-file was used to set environment variables.
+# We try to avoid this by keeping it all in the service file.
+
+Environment="JAVA_OPTS=-Xms1G -Xmx3G -server -Djava.awt.headless=true -XX:MaxMetaspaceSize=3G -Xlog:gc*:file=/opt/tomcat/logs/gc.log:time:filecount=10,filesize=102400 -XX:+UseG1GC -Dcom.sun.management.config.file=/opt/tomcat/conf/jmxremote.properties -Duf.tomcat.server.name={{ host['tomcat-name'] }} -DCoreEnvironmentBean.nodeIdentifier={{ host['tomcat-name'] }} -Duf.tomcat.log.dir=/opt/tomcat/logs/ -Duf.tomcat.sticky.route={{ host['tomcat-route'] }} -Duf.site={{ network['site'] }} -Dbtm.root=/opt/tomcat -Duf.tomcat.log.dir=/opt/tomcat/logs -DObjectStoreEnvironmentBean.objectStoreDir=/opt/tomcat/work/ObjectStore -Dcom.arjuna.ats.arjuna.objectstore.objectStoreDir=/opt/tomcat/work/ObjectStore"
+
+# On a regular Ubuntu tomcat installation, this is auto-detected
+# through a shell script, but we must be explicit and set JAVA_HOME.
+# Default: /usr/lib/jvm/java-11-openjdk-amd64
+# Can be overridden in the pillar configuration.
+Environment="JAVA_HOME={{ JAVA_HOME }}"
+
+Environment="LOGFILE_COMPRESS=0"
+Environment="CATALINA_BASE=/opt/tomcat"
+Environment="CATALINA_HOME=/opt/tomcat"
+Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
+
+# Setting the umask to be passed to tomcat startup.sh and catalina.sh
+
+Environment="UMASK=0002"
+
+# The 'default' file previously specified ulimit -n, here are the systemd
+# equivalents for reference:
+
+# Directive        ulimit equivalent     Unit
+# LimitCPU=        ulimit -t             Seconds      
+# LimitFSIZE=      ulimit -f             Bytes
+# LimitDATA=       ulimit -d             Bytes
+# LimitSTACK=      ulimit -s             Bytes
+# LimitCORE=       ulimit -c             Bytes
+# LimitRSS=        ulimit -m             Bytes
+# LimitNOFILE=     ulimit -n             Number of File Descriptors 
+# LimitAS=         ulimit -v             Bytes
+# LimitNPROC=      ulimit -u             Number of Processes 
+# LimitMEMLOCK=    ulimit -l             Bytes
+# LimitLOCKS=      ulimit -x             Number of Locks 
+# LimitSIGPENDING= ulimit -i             Number of Queued Signals 
+# LimitMSGQUEUE=   ulimit -q             Bytes
+# LimitNICE=       ulimit -e             Nice Level 
+# LimitRTPRIO=     ulimit -r             Realtime Priority  
+# LimitRTTIME=     No equivalent
+
+LimitNOFILE=16384
+
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+# NRPE is unable to open this socket on the first run: have tomcat run the plugin once
+# itself, discarding the output, to ensure the socket is open and check_jvm monitoring can start.
+# If it fails, do not fail tomcat.service ('-' before the command).
+
+ExecStartPost=-/usr/lib/nagios/plugins/check_jvm -n org.apache.catalina.startup.Bootstrap -p heap -w 3221225472 -c 3758096384
+
+[Install]
+WantedBy=multi-user.target

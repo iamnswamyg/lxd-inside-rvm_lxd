@@ -1,0 +1,25 @@
+<!--
+    This file is pushed out by salt to provide a static definition used by any app version. It is referred to via
+    symlinks named after the version of the webapp to override any config that may be included with the app
+    itself in /META-INF/context.xml as it is, at the time of writing, not correct.
+    NOTE: This file should only exist on tomcat-tar nodes.
+-->
+<Context crossContext="true">
+    <ResourceLink name="UserTransaction" global="UserTransaction" type="javax.transaction.UserTransaction" />
+    <ResourceLink name="jdbc/TransactionManager" global="jdbc/TransactionManager" type="javax.transaction.TransactionManager" />
+    <ResourceLink name="jdbc/TransactionSynchronizationRegistry" global="jdbc/TransactionSynchronizationRegistry" type="javax.transaction.TransactionSynchronizationRegistry" />
+    <ResourceLink name="jdbc/ufcolo1-ufo20" global="jdbc/ufcolo1-ufo20" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo1-ufo21" global="jdbc/ufcolo1-ufo21" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo1-ufo22" global="jdbc/ufcolo1-ufo22" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo1-ufo23" global="jdbc/ufcolo1-ufo23" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo1-ufo24" global="jdbc/ufcolo1-ufo24" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo1-ufohist" global="jdbc/ufcolo1-ufohist" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo2-ufo20" global="jdbc/ufcolo2-ufo20" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo2-ufo21" global="jdbc/ufcolo2-ufo21" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo2-ufo22" global="jdbc/ufcolo2-ufo22" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo2-ufo23" global="jdbc/ufcolo2-ufo23" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo2-ufo24" global="jdbc/ufcolo2-ufo24" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/ufcolo2-ufohist" global="jdbc/ufcolo2-ufohist" auth="Container" type="javax.sql.DataSource" />
+    <ResourceLink name="PGSwitchoverController" global="PGSwitchoverController" auth="Container" type="com.unifaun.af.servlet.container.SwitchoverController" />
+    <ResourceLink name="ContextForwarderController" global="ContextForwarderController" auth="Container" type="com.unifaun.af.servlet.container.ContextForwarderController" />
+</Context>

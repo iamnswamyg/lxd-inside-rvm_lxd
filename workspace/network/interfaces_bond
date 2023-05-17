@@ -1,0 +1,39 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+{% set host = pillar['ufconfig']['hosts'][grains.id] %}
+{% set networking = host['networking'] %}
+{%- set network = pillar['ufconfig']['networks'][networking['network']] %}
+{%- set ifaces = networking.get('ifaces', ['em1', 'em2']) %}
+{%- set iface1 = ifaces[0] %}
+{%- set iface2 = ifaces[1] %}
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+auto {{ iface1 }}
+iface {{ iface1 }} inet manual
+	bond-master bond0
+
+auto {{ iface2 }}
+iface {{ iface2 }} inet manual
+	# delay ifup to allow {{ iface1 }} to come up first in the bond
+	pre-up sleep 4
+	bond-master bond0
+
+auto bond0
+iface bond0 inet static
+        address {{ networking['address'] }}
+        netmask {{ network['netmask'] }}
+        network {{ network['network'] }}
+        broadcast {{ network['broadcast'] }}
+        gateway {{ network['gateway'] }}
+        # dns-* options are implemented by the resolvconf package, if installed
+        dns-nameservers {{ networking['dns-nameservers']|default(network['dns-nameservers'])|join(' ') }}
+        dns-search {{ network['dns-search'] }}
+	# bond0 uses standard IEEE 802.3ad LACP bonding protocol
+	bond-mode 4
+	bond-miimon 100
+	bond-lacp-rate 1
+	bond-slaves {{ iface1 }} {{ iface2 }}
