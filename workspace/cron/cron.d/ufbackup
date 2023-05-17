@@ -1,5 +1,0 @@
-SHELL=/bin/sh
-MAILTO="postmaster@ufprod.lan"
-
-0  21  *  *  *  root  /usr/local/bin/ufcleanup-backup.sh
-0  22  *  *  *  root  /usr/local/dbbackup/app/bin/start.sh

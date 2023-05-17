@@ -1,2 +1,0 @@
-41 20 * * * root /usr/local/bin/ufbackup-git-repos.sh
-

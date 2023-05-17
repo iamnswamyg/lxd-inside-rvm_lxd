@@ -1,2 +1,0 @@
-{{ restart_cron_min }} 23 * * * root /usr/local/bin/ufrestart-webapp.sh
-

@@ -1,7 +1,7 @@
 
 #!/bin/bash
 
-SCRIPT_PREFIX="ufoqa"
+SCRIPT_PREFIX="lxdc"
 STORAGE_PATH="/data/lxd/"${SCRIPT_PREFIX}
 # Get the list of running containers
 containers=$(lxc list -c ns --format=json | jq -r '.[] | .name')
@@ -46,10 +46,7 @@ pools=$(lxc storage list --format=json | jq -r '.[] | .name')
 # Loop through the profiles and delete them
 for pool in $pools; do
     if echo "$pool" | grep -q "${SCRIPT_PREFIX}"; then
-        if lxc storage list --format=json | jq -c "map(.name | select(\"${SCRIPT_PREFIX}-test\"))" | grep -q "${SCRIPT_PREFIX}"; then
-            echo "deleting btfs ${SCRIPT_PREFIX}" 
-            lxd sql global "DELETE FROM storage_volumes WHERE name='${SCRIPT_PREFIX}-test'"
-        fi
+        
 
         echo "deleting pool: $pool"
         lxc storage delete "$pool"

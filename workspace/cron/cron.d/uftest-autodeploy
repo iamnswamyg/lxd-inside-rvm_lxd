@@ -1,6 +1,0 @@
-SHELL=/bin/bash
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-5 22 * * 1-5 root /usr/local/bin/uftest-autoundeploy.sh >> /var/log/uftest-autodeploy.log 2>&1
-15 1 * * 1-5 root /usr/local/bin/uftest-autodeploy.sh >> /var/log/uftest-autodeploy.log 2>&1
-10 12 * * 1-5 root /usr/local/bin/uftest-autoundeploy.sh >> /var/log/uftest-autodeploy.log 2>&1
-15 12 * * 1-5 root /usr/local/bin/uftest-autodeploy.sh >> /var/log/uftest-autodeploy.log 2>&1

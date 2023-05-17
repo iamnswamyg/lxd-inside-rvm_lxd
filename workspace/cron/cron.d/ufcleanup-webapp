@@ -1,2 +1,0 @@
-30 01 * * * root /usr/local/bin/ufcleanup-webapp.sh
-

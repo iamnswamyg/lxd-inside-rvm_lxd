@@ -1,1 +1,0 @@
-0 22 {{ cron_day }} * * root /usr/local/bin/ufcleanup-ufo-orders.sh

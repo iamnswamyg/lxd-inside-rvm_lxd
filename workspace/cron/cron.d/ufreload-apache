@@ -1,1 +1,0 @@
-{{ restart_cron }} root /usr/local/bin/ufreload-apache.sh

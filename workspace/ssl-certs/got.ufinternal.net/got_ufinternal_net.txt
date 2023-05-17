@@ -1,4 +1,0 @@
-Certificates issued 2020-02-05.
-Csr and key generated with the following command:
-
-openssl req -new -newkey rsa:2048 -nodes -keyout STAR_got_ufinternal_net.pem -out STAR_got_ufinternal_net.csr -subj /CN=*.got.ufinternal.net; cat STAR_got_ufinternal_net.csr

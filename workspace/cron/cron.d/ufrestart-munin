@@ -1,2 +1,0 @@
-22 01 * * * root /usr/sbin/service munin-node restart
-
