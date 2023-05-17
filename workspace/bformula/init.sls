@@ -1,0 +1,2 @@
+include:
+  - bformula.display
